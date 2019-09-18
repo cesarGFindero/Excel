@@ -66,7 +66,7 @@ def detalles(datos,precio,inicio,final,cliente,mes,nombre,workbook,incios,finale
     fila_primer_findero = 5
     encabezado = 2
     espacio_vertical = 18
-    espacio_horizontal = 4
+    espacio_horizontal = 7
     
     bold = workbook.add_format({'bold': True})
     bold_titulo = workbook.add_format({'bold': True,'font_size':15})
@@ -92,8 +92,6 @@ def detalles(datos,precio,inicio,final,cliente,mes,nombre,workbook,incios,finale
     worksheet.write(celda_final_titulo,'Final:')
     worksheet.write(celda_final,reacomodo_fechas(final))
 
-    
-       
     celdas_finderos = []
     global celdas_fugas
     celdas_fugas = []
@@ -117,6 +115,11 @@ def detalles(datos,precio,inicio,final,cliente,mes,nombre,workbook,incios,finale
             worksheet.write(fila_primer_findero+3+indice*espacio_vertical,0+indice_*espacio_horizontal,'kWh',centrado)
             worksheet.write(fila_primer_findero+3+indice*espacio_vertical,1+indice_*espacio_horizontal,'Señal',centrado)
             worksheet.write(fila_primer_findero+3+indice*espacio_vertical,2+indice_*espacio_horizontal,'%',centrado)
+            
+            worksheet.write(fila_primer_findero+5+indice*espacio_vertical,3+indice_*espacio_horizontal,'Potencia',encabezados)
+            worksheet.write(fila_primer_findero+5+indice*espacio_vertical,4+indice_*espacio_horizontal,'Uso',encabezados)
+            worksheet.write(fila_primer_findero+5+indice*espacio_vertical,5+indice_*espacio_horizontal,'Horas',encabezados)
+            
             worksheet.write(fila_primer_findero+4+indice*espacio_vertical,0+indice_*espacio_horizontal, columna, formato_kWh)
             worksheet.write(fila_primer_findero+4+indice*espacio_vertical,1+indice_*espacio_horizontal,'-', centrado)
             
