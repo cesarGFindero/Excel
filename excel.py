@@ -66,7 +66,7 @@ def detalles(datos,precio,inicio,final,cliente,mes,nombre,workbook,incios,finale
     fila_primer_findero = 5
     encabezado = 2
     espacio_vertical = 18
-    espacio_horizontal = 7
+    espacio_horizontal = 4
     
     bold = workbook.add_format({'bold': True})
     bold_titulo = workbook.add_format({'bold': True,'font_size':15})
@@ -92,6 +92,8 @@ def detalles(datos,precio,inicio,final,cliente,mes,nombre,workbook,incios,finale
     worksheet.write(celda_final_titulo,'Final:')
     worksheet.write(celda_final,reacomodo_fechas(final))
 
+    
+       
     celdas_finderos = []
     global celdas_fugas
     celdas_fugas = []
@@ -115,11 +117,6 @@ def detalles(datos,precio,inicio,final,cliente,mes,nombre,workbook,incios,finale
             worksheet.write(fila_primer_findero+3+indice*espacio_vertical,0+indice_*espacio_horizontal,'kWh',centrado)
             worksheet.write(fila_primer_findero+3+indice*espacio_vertical,1+indice_*espacio_horizontal,'Señal',centrado)
             worksheet.write(fila_primer_findero+3+indice*espacio_vertical,2+indice_*espacio_horizontal,'%',centrado)
-            
-            worksheet.write(fila_primer_findero+5+indice*espacio_vertical,3+indice_*espacio_horizontal,'Potencia',encabezados)
-            worksheet.write(fila_primer_findero+5+indice*espacio_vertical,4+indice_*espacio_horizontal,'Uso',encabezados)
-            worksheet.write(fila_primer_findero+5+indice*espacio_vertical,5+indice_*espacio_horizontal,'Horas',encabezados)
-            
             worksheet.write(fila_primer_findero+4+indice*espacio_vertical,0+indice_*espacio_horizontal, columna, formato_kWh)
             worksheet.write(fila_primer_findero+4+indice*espacio_vertical,1+indice_*espacio_horizontal,'-', centrado)
             
@@ -292,8 +289,8 @@ def detalles(datos,precio,inicio,final,cliente,mes,nombre,workbook,incios,finale
     
 def desciframiento(datos,precio,inicio,final,cliente,mes,nombre,workbook,num_datos):
     
-    titulos = ['Consumo (kWh)', 'Gasto', 'Ubicación', 'Equipo', 'Proporción (%)', 'Consumo (kWh)', 'Gasto', 'Notas']
-    anchos = [12,12,15,19,15,15,10,80,10]
+    titulos = ['Consumo (kWh)', 'Gasto', 'Ubicación', 'Equipo', 'Proporción (%)','Potencia (W)','Tiempo de uso','Hrs semana','Consumo (kWh)', 'Gasto','Gasto anual', 'Notas']
+    anchos = [12,12,15,19,15,15,15,15,15,15,15,80,10]
     celda_titulo = 'A1'
     celdas = 15+len(celdas_fugas)
     filas = len(datos.keys())
@@ -330,15 +327,20 @@ def desciframiento(datos,precio,inicio,final,cliente,mes,nombre,workbook,num_dat
         worksheet.write_blank(xl_rowcol_to_cell(8+i,2),'', columna_gris)
         worksheet.write_blank(xl_rowcol_to_cell(8+i,3),'', columna_gris)
         worksheet.write_blank(xl_rowcol_to_cell(8+i,4),'', columna_blanca_1)
+        worksheet.write_blank(xl_rowcol_to_cell(8+i,5),'', columna_blanca_1)
+        worksheet.write_blank(xl_rowcol_to_cell(8+i,6),'', columna_blanca_1)
         worksheet.write_blank(xl_rowcol_to_cell(8+i,7),'', columna_blanca_1)
+        worksheet.write_blank(xl_rowcol_to_cell(8+i,11),'', columna_blanca_1)
         
     for i in range(0,celdas+4):   
         if i in [1,5,9,13,17]:
             worksheet.write_formula(xl_rowcol_to_cell(8+i,5),'', columna_blanca_vacia)
             worksheet.write_formula(xl_rowcol_to_cell(8+i,6),'', columna_blanca_vacia)
         else:
-            worksheet.write_formula(xl_rowcol_to_cell(8+i,5),'=' + xl_rowcol_to_cell(8+i,4) + '*$C$5', columna_blanca_2)
-            worksheet.write_formula(xl_rowcol_to_cell(8+i,6),'=' + xl_rowcol_to_cell(8+i,4) + '*$D$5', columna_blanca_3)
+            worksheet.write_formula(xl_rowcol_to_cell(8+i,8),'=' + xl_rowcol_to_cell(8+i,4) + '*$C$5', columna_blanca_2)
+            worksheet.write_formula(xl_rowcol_to_cell(8+i,9),'=' + xl_rowcol_to_cell(8+i,4) + '*$D$5', columna_blanca_3)            
+            worksheet.write_formula(xl_rowcol_to_cell(8+i,10),'=' + xl_rowcol_to_cell(8+i,9) + '*6', columna_blanca_3)
+
             
     worksheet.write('F4','Tarifa DAC:',bold_3)
     worksheet.write_number('G4', 5.333, dinero_1)    
@@ -492,12 +494,173 @@ def ahorro(datos,precio,inicio,final,cliente,mes,nombre,workbook):
 
     worksheet.write('G15','Impacto ambiental del ahorro:', bold)
     worksheet.write_formula('G16','ROUND(D9*0.527*6,0)')  # se multiplica por el factor de emisión en kg. Para actualizar, ver en CRE.
-    worksheet.write('H16','kg de CO2 al año')
+    worksheet.write('H16','kg de CO2e al año')
+    worksheet.write_formula('G18','ROUND(D9*0.015*6,0)')  # se multiplica por el numero de arboles necesarios para secuestrar una tonelada de CO2e, ver en carbonneutral.com/FAQs
+    worksheet.write('H18','árboles plantados que absorben esa cantidad de CO2e')
     
-    worksheet.write_formula('G18','ROUND(D9*0.015*6,0)')  # se multiplica por la razón de absorción de un árbol adulto plantado en los trópicos, ver en trees.org
-    worksheet.write('H18','árboles plantados que absorben esa cantidad de CO2')
+    
+def modelo_paneles(datos,precio,inicio,final,cliente,mes,nombre,workbook):  
+ 
+    worksheet = workbook.add_worksheet('Modelo_paneles')
+        
+    bold_1 = workbook.add_format({'bold': True,'font_size':16})
+    bold_2 = workbook.add_format({'bold': True,'align':'center'})
+    centrado_model = workbook.add_format({'align':'center'})
+    dinero_centrado = workbook.add_format({'num_format': '$      #,###      ','align':'center'})
+    text_adjust = workbook.add_format()
+    text_adjust.set_text_wrap() 
+    background_lime = workbook.add_format({'bold': True,'align':'center','font_size':14})
+    background_lime.set_pattern(1)  # This is optional when using a solid fill.
+    background_lime.set_bg_color('#BFD19F') 
+    background_brown = workbook.add_format({'bold': True,'align':'center','font_size':14})
+    background_brown.set_pattern(1)  # This is optional when using a solid fill.
+    background_brown.set_bg_color('#D6C8BF') 
+    background_silver1 = workbook.add_format({'bold': True,'align':'center','font_size':14})
+    background_silver1.set_pattern(1)  # This is optional when using a solid fill.
+    background_silver1.set_bg_color('#D2D3D4') 
+    background_silver2 = workbook.add_format({'bold': True,'align':'center','font_size':14})
+    background_silver2.set_pattern(1)  # This is optional when using a solid fill.
+    background_silver2.set_bg_color('#D2D3D4')
+    background_silver2.set_text_wrap()
+    background_cyan = workbook.add_format({'bold': True,'align':'center','font_size':14})
+    background_cyan.set_pattern(1)  # This is optional when using a solid fill.
+    background_cyan.set_bg_color('#CCE4ED')
+    background_cyan2 = workbook.add_format({'bold': True,'align':'center','font_size':14})
+    background_cyan2.set_pattern(1)  # This is optional when using a solid fill.
+    background_cyan2.set_bg_color('#CCE4ED')
+    background_cyan2.set_text_wrap()
+                                  
+    worksheet.set_column(1, 8, 20)  # Width of columns set to 20.
+    worksheet.set_column(9,19,15)
+
+                                     
+    worksheet.write('B2','Modelo de ahorros comparativos con paneles solares',bold_1)
+    worksheet.write('B3','USO EXCLUSIVO DE FINDERO O SUS CLIENTES')
+    worksheet.write('B4','Creado por Findero el 14 de Septiembre del 2019')
+
+    worksheet.write('B7','Fechas importantes',background_brown)
+    worksheet.write('B8','Fecha de implementación de medidas',text_adjust)
+    worksheet.write('B9','Fecha inical de bimestre después de implementación',text_adjust)
+    worksheet.write('B10','Días que cubre el recibo',centrado_model)
+    worksheet.write('C7','Día(s)',background_brown)
+    worksheet.write_blank('C8', None,centrado_model)
+    worksheet.write_blank('C9', None,centrado_model)
+    worksheet.write_number('C10',60,centrado_model)
+    
+    worksheet.write('B14','Resultados',bold_2)
+    worksheet.write('B15','Ahorro total con Findero')
+    worksheet.write('B16','Ahorro con paneles solares')
+    worksheet.write('B17','Ganancia/Pérdida con paneles solares')
+    worksheet.write('B18','Ganancia/Pérdida con Findero')
+    
+    worksheet.write('B20','TABLA COMPARATIVA',bold_1)
+    worksheet.write('B21','Bimestre a partir de intervención de ahorro',background_cyan2)
+    worksheet.write('C21','Año',background_cyan)
+    worksheet.write('D21','Consumo',background_cyan)
+    worksheet.write('E21','Tipo de consumo',background_cyan)
+    worksheet.write('F21','Promedio de consumo',background_cyan2)
+    worksheet.write('G21','Tipo de tarifa',background_cyan)
+    worksheet.write('H21','Costo aproximado de la energía',background_cyan2)
+    worksheet.write('B22','Bimestre -6',centrado_model)
+    worksheet.write('B23','Bimestre -5',centrado_model)
+    worksheet.write('B24','Bimestre -4',centrado_model)
+    worksheet.write('B25','Bimestre -3',centrado_model)
+    worksheet.write('B26','Bimestre -2',centrado_model)
+    worksheet.write('B27','Bimestre -1',centrado_model)
+    worksheet.write('B28','Bimestre 0',centrado_model)
+    worksheet.write('B29','Bimestre 1',centrado_model)
+    worksheet.write('B30','Bimestre 2',centrado_model)
+    worksheet.write('B31','Bimestre 3',centrado_model)
+    worksheet.write('B32','Bimestre 4',centrado_model)
+    worksheet.write('B33','Bimestre 5',centrado_model)
+    worksheet.write('B34','Bimestre 6',centrado_model)
+    
+    id_cero = xl_cell_to_rowcol('C22')[0]+1
+    for j in range(28-22+1):
+        worksheet.write_number('C'+str(id_cero+j),0,centrado_model)
+    id_uno = xl_cell_to_rowcol('C29')[0]+1
+    for j in range(34-29+1):
+        worksheet.write_number('C'+str(id_uno+j),1,centrado_model)
+    
+    id_consumo = xl_cell_to_rowcol('D22')[0]+1
+    for j in range(27-22+1):
+        worksheet.write_blank('D'+str(id_consumo+j), None,centrado_model)
+    worksheet.write('D28','=ROUND($F$27-$G$8*(C9-C8)/C10,0)',centrado_model)
+    id_resta = xl_cell_to_rowcol('D29')[0]+1
+    for j in range(34-29+1):
+        worksheet.write('D'+str(id_resta+j),'=ROUND($F$27-$G$8,0)',centrado_model)
+    
+    id_real = xl_cell_to_rowcol('E22')[0]+1
+    for j in range(27-22+1):
+        worksheet.write('E'+str(id_real+j),'Real',centrado_model)
+    id_estim = xl_cell_to_rowcol('E28')[0]+1
+    for j in range(34-28+1):
+        worksheet.write('E'+str(id_estim+j),'Estimado',centrado_model)
+        
+    id_NA = xl_cell_to_rowcol('F22')[0]+1
+    for j in range(26-22+1):
+        worksheet.write('F'+str(id_NA+j),'NA',centrado_model) 
+    id_prom = xl_cell_to_rowcol('F27')[0]+1
+    for j in range(34-27+1):
+        worksheet.write('F'+str(id_prom+j),'=ROUND(AVERAGE(D'+str(id_prom-5+j)+':D'+str(id_prom+j)+'),0)',centrado_model)
+    
+    id_tot = xl_cell_to_rowcol('G22')[0]+1
+    for j in range(34-22+1):
+        worksheet.write('G'+str(id_tot+j),'=IF(F'+str(id_tot+j)+'>499,"DAC",1)',centrado_model)
+        worksheet.write('H'+str(id_tot+j),'=IF(G'+str(id_tot+j)+'="DAC",D'+str(id_tot+j)+'*5.55872+250.35,0.94772*149+1.14608*129+(D'+str(id_tot+j)+'-280)*3.3524)',dinero_centrado)
+    
+    worksheet.merge_range('F6:H6','Intervención Findero',background_lime)
+    worksheet.write('F7','Variable',background_lime)
+    worksheet.write('G7','Valor',background_lime)
+    worksheet.write('H7','Unidades',background_lime)
+    worksheet.write('F8','Ahorro estimado mínimo',centrado_model)
+    worksheet.write('F9','Costo de medidas de ahorro',centrado_model)
+    worksheet.write('F10','Costo de servicio',centrado_model)
+    worksheet.write('F11','Bimestralidades Findero',centrado_model)
+    worksheet.write('G8','=ROUND(Ahorro!D9,0)',centrado_model)
+    worksheet.write_blank('G9',None,dinero_centrado)
+    worksheet.write_number('G10',7800,centrado_model)
+    worksheet.write('G11','=G10*1.12/6',centrado_model)
+    worksheet.write('H8', 'KWh',centrado_model)
+    worksheet.write('H9','$/medidas de ahorro',centrado_model)
+    worksheet.write('H10','$/servicio',centrado_model)
+    worksheet.write('H11','$/bimestre/servicio',centrado_model)
+    
+    worksheet.merge_range('J6:S6','Intervención paneles solares',background_silver1)
+    worksheet.write('J7','Número de paneles solares',background_silver2)
+    worksheet.write('K7','Precio de paneles solares',background_silver2)
+    worksheet.write('L7','Generación bimestral',background_silver2)
+    
+    worksheet.write('M7','Bimestralidad (12 meses)',background_silver2)
+    worksheet.write('N7','Bimestralidad (18 meses)',background_silver2)
+    worksheet.write('O7','Bimestralidad (24 meses)',background_silver2)
+    worksheet.write('P7','Bimestralidad (36 meses)',background_silver2)
+    worksheet.write('Q7','Bimestralidad (60 meses)',background_silver2)
+    worksheet.write('R7','Bimestralidad (84 meses)',background_silver2)
+    worksheet.write('S7','Contratos de largo plazo',background_silver2)
+
+    id_mens = xl_cell_to_rowcol('M8')[0]+1
+    for j in range(18-8+1):
+        worksheet.write('M'+str(id_mens+j),'=-PMT(0,12/2,K'+str(id_mens+j)+')',dinero_centrado)
+        worksheet.write('N'+str(id_mens+j),'=-PMT(0,18/2,K'+str(id_mens+j)+')',dinero_centrado)
+        worksheet.write('O'+str(id_mens+j),'=-PMT(0,24/2,K'+str(id_mens+j)+')',dinero_centrado)
+        worksheet.write('P'+str(id_mens+j),'=-PMT(0.092/6,36/2,K'+str(id_mens+j)+')',dinero_centrado)
+        worksheet.write('Q'+str(id_mens+j),'=-PMT(0.092/6,60/2,K'+str(id_mens+j)+')',dinero_centrado)
+        worksheet.write('R'+str(id_mens+j),'=-PMT(0.092/6,84/2,K'+str(id_mens+j)+')',dinero_centrado)
+    worksheet.write_number('J8',4,centrado_model)
     
     
+    id_cmplt = xl_cell_to_rowcol('K8')[0]+1
+    for j in range(18-8+1):
+        worksheet.write('K'+str(id_cmplt+j),'=J'+str(id_cmplt+j)+'*12500+6500',dinero_centrado)#Pendiente e intercepto de regresión lineal con datos Enlight
+        worksheet.write('L'+str(id_cmplt+j),'=ROUND((J'+str(id_cmplt+j)+'*330*4.1/1.2)*60/1000,1)',centrado_model)#Numero de modulos por potencia de cada uno por mínima insolacion solar promedio por 60 días del bimestre
+    
+    id_panel = xl_cell_to_rowcol('J9')[0]+1
+    for j in range(18-9+1):
+        worksheet.write('J'+str(id_panel+j),'=J'+str(id_panel+j-1)+'+2',centrado_model)
+
+
+
 def fugas(datos,precio,inicio,final,cliente,mes,nombre,workbook):
     
     worksheet = workbook.add_worksheet('Fugas')
@@ -553,13 +716,14 @@ def excel(datos,precio,inicio,final,cliente,mes,inicios,finales,periodos,fugas_a
     detalles(datos,precio,inicio,final,cliente,mes,nombre,workbook,inicios,finales,periodos,fugas_auto)
     desciframiento(datos,precio,inicio,final,cliente,mes,nombre,workbook,num_datos)
     ahorro(datos,precio,inicio,final,cliente,mes,nombre,workbook)
+    modelo_paneles(datos,precio,inicio,final,cliente,mes,nombre,workbook)
     fugas(datos,precio,inicio,final,cliente,mes,nombre,workbook)
             
     workbook.close()
 
 if __name__ == '__main__':
-    cliente = '26 Carlos Habsburgo'
-    mes = '09 Septiembre'
+    cliente = '26 Carlos de Habsburgo'
+    mes = '08 Agosto'
     inicios = ['2019-08-16', '2019-07-19', '2019-08-16', '2019-08-16']
     finales = ['2019-08-23', '2019-07-26', '2019-08-23', '2019-08-22']
     periodos = [164.37, 164.82, 162.56, 137.15]
