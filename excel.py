@@ -384,7 +384,7 @@ def desciframiento(datos,precio,inicio,final,cliente,mes,nombre,workbook,num_dat
         worksheet.write_formula(xl_rowcol_to_cell(18+i,4), '=Detalles!'+celda_porcentaje, columna_blanca_1)
         worksheet.write(xl_rowcol_to_cell(18+i,3),'=CONCATENATE("Fuga ",MID(Detalles!'+celda+',FIND(" ",Detalles!'+celda+')+1,256))', columna_gris)
         worksheet.write(xl_rowcol_to_cell(18+i,2),'=CONCATENATE("C. ",Detalles!'+celda_circuito+')', columna_gris)
-        worksheet.write(xl_rowcol_to_cell(18+i,7),'=Detalles!'+celda_notas,columna_blanca_notas)
+        worksheet.write(xl_rowcol_to_cell(18+i,7+4),'=Detalles!'+celda_notas,columna_blanca_notas)
         porcentajes_fugas.append(xl_rowcol_to_cell(18+i,4))
         
 #    for i in range(5):
