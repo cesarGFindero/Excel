@@ -458,7 +458,8 @@ def ahorro(datos,precio,inicio,final,cliente,mes,nombre,workbook):
     worksheet.write_formula('C9','SUM(C5:C8)',dinero_2) 
     worksheet.write_formula('D9','SUM(D5:D8)',kWh_2)
 #    worksheet.write_formula('D5','IF(SUM(Desciframiento!F15:F19)-40<0,0,SUM(Desciframiento!F15:F19)-40)',kWh)
-    worksheet.write_formula('D5','IF(Desciframiento!'+fugas_atacables+'<0,0,Desciframiento!'+fugas_atacables+')', kWh)
+    x, y = xl_cell_to_rowcol(fugas_atacables)
+    worksheet.write_formula('D5','IF(Desciframiento!'+xl_rowcol_to_cell(x,y+3)+'<0,0,Desciframiento!'+xl_rowcol_to_cell(x,y+3)+')', kWh)
     worksheet.write('D6','',kWh)
     worksheet.write('D7','',kWh)
     worksheet.write('D8','',kWh)
@@ -691,7 +692,7 @@ def fugas(datos,precio,inicio,final,cliente,mes,nombre,workbook):
         elemento_ = xl_cell_to_rowcol(elemento)
         fuga_titulo = xl_rowcol_to_cell(elemento_[0],elemento_[1]-1)
         circ_titulo = xl_rowcol_to_cell(elemento_[0],elemento_[1]-2)
-        nota_titulo = xl_rowcol_to_cell(elemento_[0],elemento_[1]+3)
+        nota_titulo = xl_rowcol_to_cell(elemento_[0],elemento_[1]+3+4)
         worksheet.write_formula(xl_rowcol_to_cell(5+2*i,3),'=IFERROR('+xl_rowcol_to_cell(5+2*i,2)+'/127,0)',center)  # Columna del amperaje
         worksheet.write_formula(xl_rowcol_to_cell(5+2*i,0),'=IFERROR(MID(Desciframiento!'+circ_titulo  
                                                             +',FIND(" ",Desciframiento!'+circ_titulo+')+1,256)," ")',center_2)  # Columna del circuito
