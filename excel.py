@@ -5,7 +5,7 @@
 import xlsxwriter
 from xlsxwriter.utility import xl_rowcol_to_cell
 from xlsxwriter.utility import xl_cell_to_rowcol
-import pdb 
+#import pdb 
 
 def sumatoria(cargas):
     suma = '='
@@ -295,7 +295,7 @@ def desciframiento(datos,precio,inicio,final,cliente,mes,nombre,workbook,num_dat
     celdas = 15+len(celdas_fugas)
     filas = len(datos.keys())
     
-    bold_1 = workbook.add_format({'bold': True,'font_size':12})
+#    bold_1 = workbook.add_format({'bold': True,'font_size':12})
     bold_2 = workbook.add_format({'bold': True,'font_size':15})
     bold_3 = workbook.add_format({'bold': True,'bg_color':'#E1E4EB','align':'center','border':1})
     columna_gris = workbook.add_format({'bold': True,'bg_color':'#F2F2F2','border':1})
@@ -327,10 +327,10 @@ def desciframiento(datos,precio,inicio,final,cliente,mes,nombre,workbook,num_dat
         worksheet.write_blank(xl_rowcol_to_cell(8+i,2),'', columna_gris)
         worksheet.write_blank(xl_rowcol_to_cell(8+i,3),'', columna_gris)
         worksheet.write_blank(xl_rowcol_to_cell(8+i,4),'', columna_blanca_1)
-        worksheet.write_blank(xl_rowcol_to_cell(8+i,5),'', columna_blanca_1)
-        worksheet.write_blank(xl_rowcol_to_cell(8+i,6),'', columna_blanca_1)
-        worksheet.write_blank(xl_rowcol_to_cell(8+i,7),'', columna_blanca_1)
-        worksheet.write_blank(xl_rowcol_to_cell(8+i,11),'', columna_blanca_1)
+        worksheet.write_blank(xl_rowcol_to_cell(8+i,5),'', columna_blanca_2)
+        worksheet.write_blank(xl_rowcol_to_cell(8+i,6),'', columna_blanca_2)
+        worksheet.write_blank(xl_rowcol_to_cell(8+i,7),'', columna_blanca_2)
+        worksheet.write_blank(xl_rowcol_to_cell(8+i,11),'', columna_blanca_notas)
         
     for i in range(0,celdas+4):   
         if i in [1,5,9,13,17]:
@@ -347,11 +347,16 @@ def desciframiento(datos,precio,inicio,final,cliente,mes,nombre,workbook,num_dat
     worksheet.write_formula('D5','=C5*G4',columna_blanca_3)
     worksheet.write_formula('C5','=Detalles!'+celda_consumo_bim,columna_blanca_2)
     
+
     worksheet.write('D9','Refrigerador', columna_gris)
+    worksheet.write('M9','Cava [m3]:',columna_blanca_1)
+    worksheet.write_formula('N9','IF(K9>162,((K9-162.912)/11.974)*0.0283168,0)',columna_blanca_2)
     
     worksheet.write('D11','Bomba de agua', columna_gris)
     worksheet.write('D12','Centro de lavado', columna_gris)
     worksheet.write('D13',"Tv's", columna_gris)
+    worksheet.write('M13','TV ["]:',columna_blanca_1)
+    worksheet.write_formula('N13','4.9012*(F13^0.4627)',columna_blanca_2)
     
     worksheet.write_formula('E11',crear_vlookup(filas,'Bomba'), columna_blanca_1)  
     worksheet.write_formula('E12',crear_vlookup(filas,'Lavado'), columna_blanca_1)
@@ -400,6 +405,8 @@ def desciframiento(datos,precio,inicio,final,cliente,mes,nombre,workbook,num_dat
     worksheet.write(xl_rowcol_to_cell(8+celdas+1,3),'Total de Fugas',bold_3)
     worksheet.write(xl_rowcol_to_cell(8+celdas+2,3),'Fugas atacables',bold_3)
     worksheet.write(xl_rowcol_to_cell(8+celdas+3,3),'Total de pendientes',bold_3)
+    
+    
     
     worksheet.write_formula(xl_rowcol_to_cell(8+celdas,4),'=SUM('+xl_rowcol_to_cell(8,4)+
                                                                 ':'+xl_rowcol_to_cell(8+celdas-1,4)+
