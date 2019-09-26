@@ -34,8 +34,8 @@ def crear_vlookup(filas,aparato):
     formula = '='
     for f in range(filas):
         for c in range(0,12):
-            esquina_1 = xl_rowcol_to_cell(11+18*f,1+4*c)
-            esquina_2 = xl_rowcol_to_cell(14+18*f,2+4*c)
+            esquina_1 = xl_rowcol_to_cell(11+18*f,1+7*c)
+            esquina_2 = xl_rowcol_to_cell(14+18*f,2+7*c)
             formula+='IFERROR(VLOOKUP("'+aparato+'",Detalles!'+esquina_1+':'+esquina_2+',2,FALSE),0)'+'+'
     return formula[:-1] 
     
@@ -292,7 +292,7 @@ def detalles(datos,precio,inicio,final,cliente,mes,nombre,workbook,incios,finale
     
 def desciframiento(datos,precio,inicio,final,cliente,mes,nombre,workbook,num_datos):
     
-    titulos = ['Consumo (kWh)', 'Gasto', 'Ubicación', 'Equipo', 'Proporción (%)','Potencia (W)','Tiempo de uso','Hrs semana','Consumo (kWh)', 'Gasto','Gasto anual', 'Notas']
+    titulos = ['Consumo (kWh)', 'Gasto', 'Ubicación', 'Equipo', 'Proporción (%)','Consumo (kWh)', 'Gasto','Gasto anual','Potencia (W)','Tiempo de uso','Hrs semana', 'Notas']
     anchos = [12,12,15,19,15,15,15,15,15,15,15,80,10]
     celda_titulo = 'A1'
     celdas = 15+len(celdas_fugas)
@@ -330,9 +330,9 @@ def desciframiento(datos,precio,inicio,final,cliente,mes,nombre,workbook,num_dat
         worksheet.write_blank(xl_rowcol_to_cell(8+i,2),'', columna_gris)
         worksheet.write_blank(xl_rowcol_to_cell(8+i,3),'', columna_gris)
         worksheet.write_blank(xl_rowcol_to_cell(8+i,4),'', columna_blanca_1)
-        worksheet.write_blank(xl_rowcol_to_cell(8+i,5),'', columna_blanca_2)
-        worksheet.write_blank(xl_rowcol_to_cell(8+i,6),'', columna_blanca_2)
-        worksheet.write_blank(xl_rowcol_to_cell(8+i,7),'', columna_blanca_2)
+        worksheet.write_blank(xl_rowcol_to_cell(8+i,8),'', columna_blanca_2)
+        worksheet.write_blank(xl_rowcol_to_cell(8+i,9),'', columna_blanca_2)
+        worksheet.write_blank(xl_rowcol_to_cell(8+i,10),'', columna_blanca_2)
         worksheet.write_blank(xl_rowcol_to_cell(8+i,11),'', columna_blanca_notas)
         
     for i in range(0,celdas+4):   
@@ -340,9 +340,9 @@ def desciframiento(datos,precio,inicio,final,cliente,mes,nombre,workbook,num_dat
             worksheet.write_formula(xl_rowcol_to_cell(8+i,5),'', columna_blanca_vacia)
             worksheet.write_formula(xl_rowcol_to_cell(8+i,6),'', columna_blanca_vacia)
         else:
-            worksheet.write_formula(xl_rowcol_to_cell(8+i,8),'=' + xl_rowcol_to_cell(8+i,4) + '*$C$5', columna_blanca_2)
-            worksheet.write_formula(xl_rowcol_to_cell(8+i,9),'=' + xl_rowcol_to_cell(8+i,4) + '*$D$5', columna_blanca_3)            
-            worksheet.write_formula(xl_rowcol_to_cell(8+i,10),'=' + xl_rowcol_to_cell(8+i,9) + '*6', columna_blanca_3)
+            worksheet.write_formula(xl_rowcol_to_cell(8+i,5),'=' + xl_rowcol_to_cell(8+i,4) + '*$C$5', columna_blanca_2)
+            worksheet.write_formula(xl_rowcol_to_cell(8+i,6),'=' + xl_rowcol_to_cell(8+i,4) + '*$D$5', columna_blanca_3)            
+            worksheet.write_formula(xl_rowcol_to_cell(8+i,7),'=' + xl_rowcol_to_cell(8+i,6) + '*6', columna_blanca_3)
 
             
     worksheet.write('F4','Tarifa DAC:',bold_3)
@@ -353,13 +353,13 @@ def desciframiento(datos,precio,inicio,final,cliente,mes,nombre,workbook,num_dat
 
     worksheet.write('D9','Refrigerador', columna_gris)
     worksheet.write('M9','Cava [m3]:',columna_blanca_1)
-    worksheet.write_formula('N9','IF(K9>162,((K9-162.912)/11.974)*0.0283168,0)',columna_blanca_2)
+    worksheet.write_formula('N9','IF(F9>162,((F9-162.912)/11.974)*0.0283168,0)',columna_blanca_2)
     
     worksheet.write('D11','Bomba de agua', columna_gris)
     worksheet.write('D12','Centro de lavado', columna_gris)
     worksheet.write('D13',"Tv's", columna_gris)
     worksheet.write('M13','TV ["]:',columna_blanca_1)
-    worksheet.write_formula('N13','4.9012*(F13^0.4627)',columna_blanca_2)
+    worksheet.write_formula('N13','4.9012*(I13^0.4627)',columna_blanca_2)
     
     worksheet.write_formula('E11',crear_vlookup(filas,'Bomba'), columna_blanca_1)  
     worksheet.write_formula('E12',crear_vlookup(filas,'Lavado'), columna_blanca_1)
@@ -461,8 +461,7 @@ def ahorro(datos,precio,inicio,final,cliente,mes,nombre,workbook):
     worksheet.write_formula('C9','SUM(C5:C8)',dinero_2) 
     worksheet.write_formula('D9','SUM(D5:D8)',kWh_2)
 #    worksheet.write_formula('D5','IF(SUM(Desciframiento!F15:F19)-40<0,0,SUM(Desciframiento!F15:F19)-40)',kWh)
-    x, y = xl_cell_to_rowcol(fugas_atacables)
-    worksheet.write_formula('D5','IF(Desciframiento!'+xl_rowcol_to_cell(x,y+3)+'<0,0,Desciframiento!'+xl_rowcol_to_cell(x,y+3)+')', kWh)
+    worksheet.write_formula('D5','IF(Desciframiento!'+fugas_atacables+'<0,0,Desciframiento!'+fugas_atacables+')', kWh)
     worksheet.write('D6','',kWh)
     worksheet.write('D7','',kWh)
     worksheet.write('D8','',kWh)
@@ -506,7 +505,7 @@ def ahorro(datos,precio,inicio,final,cliente,mes,nombre,workbook):
     worksheet.write('G15','Impacto ambiental del ahorro:', bold)
     worksheet.write_formula('G16','ROUND(D9*0.527*6,0)')  # se multiplica por el factor de emisión en kg. Para actualizar, ver en CRE.
     worksheet.write('H16','kg de CO2e al año')
-    worksheet.write_formula('G18','ROUND(D9*0.015*6,0)')  # se multiplica por el numero de arboles necesarios para secuestrar una tonelada de CO2e, ver en carbonneutral.com/FAQs
+    worksheet.write_formula('G18','ROUND(G16*0.015*6,0)')  # se multiplica por el numero de arboles necesarios para secuestrar una tonelada de CO2e, ver en carbonneutral.com/FAQs
     worksheet.write('H18','árboles plantados que absorben esa cantidad de CO2e')
     
     
@@ -738,7 +737,8 @@ if __name__ == '__main__':
     inicios = ['2019-08-16', '2019-07-19', '2019-08-16', '2019-08-16']
     finales = ['2019-08-23', '2019-07-26', '2019-08-23', '2019-08-22']
     periodos = [164.37, 164.82, 162.56, 137.15]
-    precio = 5.626
+#    precio = 5.626
+    precio = '=Desciframiento!G4'
     inicio = '2019-08-16'
     final = '2019-08-22'
     datos = {'DATALOG_B08_Habsburgo.CSV': [17.0, 3.5, 122.4, 7.8, 0.2, 134.6, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1], 'DATALOG_B13_Habsburgo.CSV': [0.0, 31.6, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.1], 'DATALOG_COM06_Habsburgo.CSV': [0.2, 0.9, 0.0, 91.7, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 'DATALOG_COM19_Habsburgo.CSV': [3.3, 0.0, 0.3, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}
